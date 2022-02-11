@@ -37,35 +37,35 @@ const menuList = [
             },
             {
                 title: '轮播图',
-                key: '/admin/ui/carousel',
+                key: '/admin/ui/carousels',
             }
         ]
     },
     {
         title: '表单',
-        key: '/form',
+        key: '/admin/form',
         children: [
             {
                 title: '登录',
-                key: '/form/login',
+                key: 'admin/form/login',
             },
             {
                 title: '注册',
-                key: '/form/reg',
+                key: 'admin/form/reg',
             }
         ]
     },
     {
         title: '表格',
-        key: '/table',
+        key: '/admin/table',
         children: [
             {
                 title: '基础表格',
-                key: '/table/basic',
+                key: '/admin/table/basic',
             },
             {
                 title: '高级表格',
-                key: '/table/high',
+                key: '/admin/table/high',
             }
         ]
     },
