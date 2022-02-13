@@ -95,6 +95,19 @@ export default class Order extends Component {
         })
     }
 
+    // 订单详情
+    openOrderDetail = () => {
+        let item = this.state.selectedItem;
+        if (!item) {
+            Modal.info({
+                title: "信息",
+                content: "请先选择一条订单"
+            })
+            return;
+        }
+        window.open(`/#/common/order/detail/${item.id}`, "_blank")
+    }
+
     render() {
         const columns = [
             {
@@ -186,7 +199,7 @@ export default class Order extends Component {
                     </Form>
                 </Card>
                 <Card style={{ marginTop: 10 }}>
-                    <Button type="primary">订单详情</Button>
+                    <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button>
                     <Button type="primary" style={{ marginLeft: 10 }} onClick={this.handleConfirm}>结束订单</Button>
                 </Card>
                 <div className="content-wrap">

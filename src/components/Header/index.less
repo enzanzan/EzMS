@@ -2,12 +2,29 @@
 
 .header {
     background-color: @colorM;
+    width: 100%;
 
     .header-top {
         text-align: right;
         padding: 0 20px;
         height: 60px;
         line-height: 60px;
+
+        .logo {
+            line-height: 60px;
+            text-align: left;
+            font-size: 18px;
+
+            img {
+                height: 40px;
+                vertical-align: middle;
+
+            }
+
+            span {
+                margin-left: 5px;
+            }
+        }
 
         a {
             margin-left: 40px;
@@ -44,5 +61,13 @@
                 margin-right: 10px;
             }
         }
+    }
+}
+
+// common 页面简单头
+.simple-page {
+    .header-top {
+        background: #1890ff;
+        color: @colorM;
     }
 }
