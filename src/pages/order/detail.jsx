@@ -33,9 +33,10 @@ export default class OrderDetail extends Component {
 
     renderMap = result => {
         this.map = new window.BMapGL.Map("orderDetailMap");// 初始化地图
-        this.map.centerAndZoom("116.404, 39.915", 11);  // 设置中心点坐标和地图级别
+        this.map.centerAndZoom("北京", 11);  // 设置中心点坐标和地图级别
         this.addMapControl();  // 调用添加地图控件
         this.drawBikeRoute(result.position_list); //调用路线图绘制方法
+        this.drawServiceArea(result.area);  // 调用绘制服务区方法
     }
 
     // 添加地图控件
@@ -43,7 +44,7 @@ export default class OrderDetail extends Component {
         let map = this.map;
         map.addControl(new window.BMapGL.ScaleControl({ anchor: window.BMAP_ANCHOR_TOP_RIGHT })); // 添加比例尺控件
         map.addControl(new window.BMapGL.ZoomControl({ anchor: window.BMAP_ANCHOR_TOP_RIGHT })); // 添加缩放控件
-        map.addControl(new window.BMapGL.CityListControl({ anchor: window.BMAP_ANCHOR_TOP_RIGHT })); // 添加城市列表控件
+        map.addControl(new window.BMapGL.CityListControl({ anchor: window.BMAP_ANCHOR_TOP_LEFT })); // 添加城市列表控件
     }
 
     // 绘制用户的行驶路线
@@ -52,18 +53,64 @@ export default class OrderDetail extends Component {
         let startPoint = "";
         let endPoint = "";
         if (positionList.length > 0) {
-            let arr = positionList[0];
+            let first = positionList[0];
+            let last = positionList[positionList.length - 1];
             // 创建起始图标点
-            startPoint = new window.BMap.Point(arr, lon, arr.lat);
+            startPoint = new window.BMapGL.Point(first.lon, first.lat);
             // 获取图标
-            let startIcon = new window.BMap.Icon("/assets/start_point.png", new window.BMap.Size(36, 42), {
-                imageSize: new window.BMap.Size(36, 42),
-                anchor: new window.BMap.Size(36, 42),
+            let startIcon = new window.BMapGL.Icon("/assets/start_point.png", new window.BMapGL.Size(36, 42), {
+                imageSize: new window.BMapGL.Size(36, 42),
+                anchor: new window.BMapGL.Size(36, 42),
             })
             // 图标依赖 Marker添加
-            let startMarker = new window.BMap.Marker(startPoint, { icon: startIcon });
+            let startMarker = new window.BMapGL.Marker(startPoint, { icon: startIcon });
+            map.addOverlay(startMarker);
+
+            // 创建结束图标点
+            endPoint = new window.BMapGL.Point(last.lon, last.lat);
+            // 获取图标
+            let endIcon = new window.BMapGL.Icon("/assets/end_point.png", new window.BMapGL.Size(36, 42), {
+                imageSize: new window.BMapGL.Size(36, 42),
+                anchor: new window.BMapGL.Size(36, 42),
+            })
+            // 图标依赖 Marker添加
+            let endMarker = new window.BMapGL.Marker(endPoint, { icon: endIcon });
+            map.addOverlay(endMarker);
+
+            //连接路线图
+            let trackPoint = [];
+            for (let i = 0; i < positionList.length; i++) {
+                let point = positionList[i];
+                trackPoint.push(new window.BMapGL.Point(point.lon, point.lat));//保存所有坐标点
+            }
+            // 创建折线
+            let polyline = new window.BMapGL.Polyline(trackPoint, {
+                strokeColor: "#1869AD", // 折线颜色
+                strokeWeight: 3,  // 折线的宽度
+                strokeOpacity: 1,  // 折线的透明度
+            })
+            map.addOverlay(polyline);
+            map.centerAndZoom(endPoint, 11);
         }
     }
+
+    // 绘制服务区
+    drawServiceArea = positionList => {
+        let trackPoint = [];
+        for (let i = 0; i < positionList.length; i++) {
+            let point = positionList[i];
+            trackPoint.push(new window.BMapGL.Point(point.lon, point.lat));//保存所有坐标点
+        }
+        let polygon = new window.BMapGL.Polygon(trackPoint, {
+            strokeColor: "#CE0000", // 折线颜色
+            strokeWeight: 3,  // 折线的宽度
+            strokeOpacity: 1,  // 折线的透明度
+            fillColor: "#ff8065",  // 填充颜色
+            fillOpacity: 0.4
+        })
+        this.map.addOverlay(polygon);
+    }
+
     render() {
         const info = this.state.orderInfo || {};
         return (

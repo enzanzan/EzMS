@@ -50,7 +50,8 @@ export default class City extends Component {
 
     // 城市开通提交
     handelSubmit = () => {
-        let formData = this.refs.myForm4.getFieldValue();
+        let formData = this.refs.myForm4.getFieldsValue();
+        console.log(formData)
         axios.ajax({
             url: "/openSuccess.php",
             data: {
@@ -190,23 +191,30 @@ export default class City extends Component {
                     }}
                     onOk={this.handelSubmit}
                 >
-                    <Form layout="horizontal" ref="myForm4">
+                    <Form layout="horizontal" ref="myForm4"
+                        initialValues={
+                            {
+                                name: "",
+                                op_mode: "",
+                                mode: "1",
+                            }
+                        }>
                         <FormItem label="选择城市" {...formItemLayout} name="name">
-                            <Select style={{ width: 100 }} defaultValue="">
+                            <Select style={{ width: 100 }} >
                                 <Select.Option value="">全部</Select.Option>
                                 <Select.Option value="1">北京市</Select.Option>
                                 <Select.Option value="2">天津市</Select.Option>
                             </Select>
                         </FormItem>
                         <FormItem label="营运模式" {...formItemLayout} name="op_mode">
-                            <Select style={{ width: 100 }} defaultValue="">
+                            <Select style={{ width: 100 }} >
                                 <Select.Option value="">全部</Select.Option>
                                 <Select.Option value="1">自营</Select.Option>
                                 <Select.Option value="2">加盟</Select.Option>
                             </Select>
                         </FormItem>
                         <FormItem label="用车模式" {...formItemLayout} name="mode">
-                            <Select style={{ width: 100 }} defaultValue="1">
+                            <Select style={{ width: 150 }} >
                                 <Select.Option value="1">指定停车模式</Select.Option>
                                 <Select.Option value="2">禁停区模式</Select.Option>
                             </Select>

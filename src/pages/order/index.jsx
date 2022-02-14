@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card, Button, Table, Form, Select, Modal, message, DatePicker } from 'antd';
 import axios from './../../axios';
-import moment from 'moment';
 import Utils from '../../utils/utils';
+import BaseForm from './../../components/BaseForm';
 
 const FormItem = Form.Item;
 export default class Order extends Component {
@@ -13,28 +13,58 @@ export default class Order extends Component {
     params = {
         page: 1
     }
+    formList = [
+        {
+            type: "SELECT",
+            label: "城市",
+            field: "city",
+            placeholder: "全部",
+            initialValue: "1",
+            width: 100,
+            list: [{ id: "0", name: "全部" }, { id: "1", name: "北京市" }, { id: "2", name: "天津市" }, { id: "3", name: "上海市" }]
+        },
+        {
+            type: "时间查询",
+        },
+        {
+            type: "SELECT",
+            label: "订单状态",
+            field: "order_status",
+            placeholder: "全部",
+            initialValue: "1",
+            width: 100,
+            list: [{ id: "0", name: "全部" }, { id: "1", name: "进行中" }, { id: "2", name: "结束行程" }]
+        },
+    ]
+
+    handleFilter = params => {
+        this.params = params;
+        this.requestList();
+    }
+
     componentDidMount() {
         this.requestList();
     }
     requestList = () => {
         let _this = this;
-        axios.ajax({
-            url: "/order.php",
-            data: {
-                page: this.params.page
-            }
-        }).then(res => {
-            this.setState({
-                list: res.result.map((item, index) => {
-                    item.key = index;
-                    return item;
-                }),
-                pagination: Utils.pagination(res, current => {
-                    _this.params.page = current;
-                    _this.requestList();
-                })
-            })
-        })
+        axios.requestList(this, "/order.php", this.params, true);
+        // axios.ajax({
+        //     url: "/order.php",
+        //     data: {
+        //         page: this.params
+        //     }
+        // }).then(res => {
+        //     this.setState({
+        //         list: res.result.map((item, index) => {
+        //             item.key = index;
+        //             return item;
+        //         }),
+        //         pagination: Utils.pagination(res, current => {
+        //             _this.params.page = current;
+        //             _this.requestList();
+        //         })
+        //     })
+        // })
     }
 
     // 结束订单确认
@@ -170,7 +200,8 @@ export default class Order extends Component {
         return (
             <div>
                 <Card>
-                    <Form layout="inline" ref="myForm5">
+                    <BaseForm ref="myForm5" formList={this.formList} filterSubmit={this.handleFilter} />
+                    {/* <Form layout="inline" ref="myForm5">
                         <FormItem label="城市" >
                             <Select placeholder="全部" style={{ width: 80 }}>
                                 <Select.Option value="">全部</Select.Option>
@@ -196,7 +227,7 @@ export default class Order extends Component {
                             <Button type="primary" style={{ margin: "0 20px" }}>查询</Button>
                             <Button>重置</Button>
                         </FormItem>
-                    </Form>
+                    </Form> */}
                 </Card>
                 <Card style={{ marginTop: 10 }}>
                     <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button>

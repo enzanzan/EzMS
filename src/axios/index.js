@@ -4,6 +4,32 @@ import JsonP from 'jsonp';
 import Utils from './../utils/utils';
 
 export default class Axios {
+
+    static requestList(_this, url, params, isMock) {
+        var data = {
+            params,
+            isMock
+        }
+        this.ajax({
+            url,
+            data
+        }).then(data => {
+            if (data && data.result) {
+                let list = data.result.map((item, index) => {
+                    item.key = index;
+                    return item;
+                })
+                _this.setState({
+                    list,
+                    pagination: Utils.pagination(data, current => {
+                        _this.params.page = current;
+                        _this.requestList();
+                    })
+                })
+            }
+        })
+    }
+
     static jsonp(options) {
         return new Promise((resolve, reject) => {
             JsonP(options.url, {
