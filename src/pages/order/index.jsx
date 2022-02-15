@@ -3,6 +3,7 @@ import { Card, Button, Table, Form, Select, Modal, message, DatePicker } from 'a
 import axios from './../../axios';
 import Utils from '../../utils/utils';
 import BaseForm from './../../components/BaseForm';
+import ETable from './../../components/ETable';
 
 const FormItem = Form.Item;
 export default class Order extends Component {
@@ -117,13 +118,14 @@ export default class Order extends Component {
     }
 
     // 点击行
-    onRowClick = (record, index) => {
-        let selectKey = [index];
-        this.setState({
-            selectedRowKeys: selectKey,
-            selectedItem: record
-        })
-    }
+    // onRowClick = (record, index) => {
+    //     let selectKey = [index];
+    //     this.setState({
+    //         selectedRowKeys: selectKey,
+    //         selectedItem: record
+    //     })
+    // }
+
 
     // 订单详情
     openOrderDetail = () => {
@@ -192,11 +194,11 @@ export default class Order extends Component {
             labelCol: { span: 5 },
             wrpperCol: { span: 19 }
         }
-        const { selectedRowKeys } = this.state;
-        const rowSelection = {
-            type: "radio",
-            selectedRowKeys
-        }
+        // const { selectedRowKeys } = this.state;
+        // const rowSelection = {
+        //     type: "radio",
+        //     selectedRowKeys
+        // }
         return (
             <div>
                 <Card>
@@ -234,7 +236,17 @@ export default class Order extends Component {
                     <Button type="primary" style={{ marginLeft: 10 }} onClick={this.handleConfirm}>结束订单</Button>
                 </Card>
                 <div className="content-wrap">
-                    <Table
+                    <ETable
+                        updateSelectedItem={Utils.updateSelectedItem.bind(this)}
+                        columns={columns}
+                        dataSource={this.state.list}
+                        selectedRowKeys={this.state.selectedRowKeys}
+                        selectedIds={this.state.selectedIds}
+                        selectedItem={this.state.selectedItem}
+                        pagination={this.state.pagination}
+                        rowSelection="checkbox"
+                    />
+                    {/* <Table
                         bordered
                         rowSelection={rowSelection}
                         onRow={(record, index) => {
@@ -247,7 +259,7 @@ export default class Order extends Component {
                         columns={columns}
                         dataSource={this.state.list}
                         pagination={this.state.pagination}
-                    />
+                    /> */}
                 </div>
                 <Modal
                     title="结束订单"

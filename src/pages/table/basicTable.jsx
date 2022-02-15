@@ -96,10 +96,10 @@ export default class BasicTable extends Component {
     // 点击行
     onRowClick = (record, index) => {
         let selectKey = [index];
-        Modal.info({
-            title: "信息",
-            content: `用户名：${record.userName}，用户爱好：${record.interest}`
-        })
+        // Modal.info({
+        //     title: "信息",
+        //     content: `用户名：${record.userName}，用户爱好：${record.interest}`
+        // })
         this.setState({
             selectedRowKeys: selectKey,
             selectedItem: record
@@ -241,6 +241,13 @@ export default class BasicTable extends Component {
                         columns={columns}
                         dataSource={this.state.dataSource2}
                         pagination={false}
+                    // onRow={(record, index) => {
+                    //     return {
+                    //         onClick: () => {
+                    //             this.onRowClick(record, index)
+                    //         }, // 点击行
+                    //     };
+                    // }}
                     />
                 </Card>
                 <Card title="Mock-分页" style={{ margin: "10px 0" }}>

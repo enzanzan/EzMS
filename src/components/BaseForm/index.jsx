@@ -40,7 +40,7 @@ export default class FilterForm extends Component {
                     </FormItem>;
                     formItemList.push(end_time);
                 } else if (item.type === "INPUT") {
-                    const INPUT = <FormItem label={label} key={field} name="input">
+                    const INPUT = <FormItem label={label} key={field} name={label}>
                         <Input type="text" placeholder={placeholder} />
                     </FormItem>;
                     formItemList.push(INPUT);
@@ -58,6 +58,11 @@ export default class FilterForm extends Component {
                         </Checkbox>
                     </FormItem>;
                     formItemList.push(CHECKBOX);
+                } else if (item.type === "DATE") {
+                    const Date = <FormItem label={label} key={field} name="datepicker">
+                        <DatePicker showTime={true} placeholder={placeholder} showTime format="YYYY-MM-DD HH:mm:ss" />
+                    </FormItem>;
+                    formItemList.push(Date);
                 }
             })
         }
