@@ -5,6 +5,8 @@ import axios from './../../axios';
 import Utils from './../../utils/utils';
 import BaseForm from './../../components/BaseForm';
 import ETable from './../../components/ETable';
+import moment from 'moment';
+
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -58,21 +60,76 @@ export default class User extends Component {
 
     // 功能区操作
     handleOperate = type => {
-        if (type === "create") {
+        let item = this.state.selectedItem;
+        console.log("item" + item);
+        if (type === "create") {  // 添加员工
             this.setState({
                 type,
                 isVisible: true,
                 title: "创建员工"
             })
+        } else if (type === "edit") {  // 编辑员工
+            if (!item) {
+                Modal.info({
+                    title: "提示",
+                    content: "请选择一个用户"
+                })
+                return;
+            }
+            this.setState({
+                type,
+                isVisible: true,
+                title: "编辑员工",
+                userInfo: item
+            })
+        } else if (type === "detail") {  // 员工详情
+            this.setState({
+                type,
+                isVisible: true,
+                title: "员工详情",
+                userInfo: item
+            })
+        } else {
+            if (!item) {
+                Modal.info({
+                    title: "提示",
+                    content: "请选择一个用户"
+                })
+                return;
+            }
+            // 当前作用域this已发生变化
+            let _this = this;
+            Modal.confirm({
+                title: "确认删除",
+                content: "是否要删除选中的员工",
+                onOk() {
+                    axios.ajax({
+                        url: "deleteUser.php",
+                        data: {
+                            params: {
+                                id: item.id
+                            }
+                        }
+                    }).then(res => {
+                        if (res.code === 0) {
+                            _this.setState({
+                                isVisible: false
+                            })
+                            _this.requestList();
+                        }
+                    })
+                }
+            })
         }
     }
 
-    // 创建员工提交
+    // 添加员工提交
     handleSubmit = () => {
-        // let type = this.state.type;
+        let type = this.state.type;
         let data = this.refs.myForm6.getFieldValue();
+        console.log(data);
         axios.ajax({
-            url: "addUser.php",
+            url: type === "create" ? "/addUser.php" : "/editUser.php",
             data: {
                 params: data
             }
@@ -87,8 +144,22 @@ export default class User extends Component {
         })
     }
 
-    render() {
+    // 状态值
+    getState = state => {
+        return {
+            "1": "咸鱼一条",
+            "2": "风华浪子",
+            "3": "北大才子",
+            "4": "百度FE",
+            "5": "创业者"
+        }[state]
+    }
 
+
+    render() {
+        let type = this.state.type;
+        let userInfo = this.state.userInfo || {};
+        console.log(userInfo);
         const columns = [
             {
                 title: "id",
@@ -153,13 +224,21 @@ export default class User extends Component {
             wrapperCol: { span: 19 }
         }
 
+        // footer
+        let footer = {};
+        if (this.state.type === "detail") {
+            footer = {
+                footer: null
+            }
+        }
+
         return (
             <div>
                 <Card>
                     <BaseForm formList={this.formList} />
                 </Card>
                 <Card style={{ marginTop: 10 }} className="operate-wrap">
-                    <Button type="primary" icon={<PlusOutlined />} onClick={() => this.handleOperate("create")}>创建员工</Button>
+                    <Button type="primary" icon={<PlusOutlined />} onClick={() => this.handleOperate("create")}>添加员工</Button>
                     <Button type="primary" icon={<EditOutlined />} onClick={() => this.handleOperate("edit")}>编辑员工</Button>
                     <Button type="primary" onClick={() => this.handleOperate("detail")}>员工详情</Button>
                     <Button type="primary" icon={<DeleteOutlined />} onClick={() => this.handleOperate("delete")}>删除员工</Button>
@@ -185,31 +264,48 @@ export default class User extends Component {
                         })
                     }}
                     width={600}
+                    {...footer}
                 >
-                    <Form layout="horizontal" type={this.state.type} ref="myForm6">
-                        <FormItem label="用户名" {...formItemLayout} name="username">
-                            <Input placeholder="请输入用户名" />
+                    <Form layout="horizontal" type={this.state.type} ref="myForm6"
+                        initialValues={  //点击编辑员工的时候，默认列出选中的员工的信息
+                            {
+                                username: userInfo.username,
+                                sex: userInfo.sex,
+                                state: userInfo.state,
+                                birthday: moment(userInfo.birthday),
+                                address: userInfo.address
+                            }
+                        }
+                    >
+                        <FormItem label="用户名" {...formItemLayout} name="username" >
+                            {type === "detail" ? userInfo.username
+                                : <Input placeholder="请输入用户名" />}
                         </FormItem>
-                        <FormItem label="性别" {...formItemLayout} name="sex">
-                            <RadioGroup >
-                                <Radio value={1}>男</Radio>
-                                <Radio value={2}>女</Radio>
-                            </RadioGroup>
+                        <FormItem label="性别" {...formItemLayout} name="sex" >
+                            {type === "detail" ? userInfo.sex === 1 ? "男" : "女"
+                                :
+                                <RadioGroup >
+                                    <Radio value={1}>男</Radio>
+                                    <Radio value={2}>女</Radio>
+                                </RadioGroup>
+                            }
                         </FormItem>
                         <FormItem label="状态" {...formItemLayout} name="state">
-                            <Select>
-                                <Select.Option value="1">咸鱼一条</Select.Option>
-                                <Select.Option value="2">风华浪子</Select.Option>
-                                <Select.Option value="3">北大才子</Select.Option>
-                                <Select.Option value="4">百度FE</Select.Option>
-                                <Select.Option value="5">创业者</Select.Option>
-                            </Select>
+                            {type === "detail" ? this.getState(userInfo.state)
+                                : <Select>
+                                    <Select.Option value={1}>咸鱼一条</Select.Option>
+                                    <Select.Option value={2}>风华浪子</Select.Option>
+                                    <Select.Option value={3}>北大才子</Select.Option>
+                                    <Select.Option value={4}>百度FE</Select.Option>
+                                    <Select.Option value={5}>创业者</Select.Option>
+                                </Select>
+                            }
                         </FormItem>
                         <FormItem label="生日" {...formItemLayout} name="birthday">
-                            <DatePicker />
+                            {type === "detail" ? userInfo.birthday : <DatePicker />}
                         </FormItem>
-                        <FormItem label="联系地址" {...formItemLayout} name="address">
-                            <TextArea rows={3} placeholder="请输入联系地址" />
+                        <FormItem label="联系地址" {...formItemLayout} name="address" >
+                            {type === "detail" ? userInfo.address : <TextArea rows={3} placeholder="请输入联系地址" />}
                         </FormItem>
                     </Form>
                 </Modal>
