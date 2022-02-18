@@ -151,7 +151,7 @@ export default class PermissionUser extends Component {
                 >
                     <Form layout="horizontal" ref="myForm8">
                         <FormItem label="角色名称"  {...formItemLayout}>
-                            <Input disabled />
+                            <Input disabled placeholder={this.state.detailInfo ? this.state.detailInfo.role_name : ""} />
                         </FormItem>
                         <FormItem label="状态" {...formItemLayout} name="status" initialValue="1" >
                             <Select>
