@@ -1,14 +1,30 @@
 import React, { Component } from 'react';
 import { Menu } from 'antd';
 import { NavLink } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { switchMenu } from '../../redux/action';
 import MenuConfig from '../../config/menuConfig.js';
 import './index.less';
 
 const { SubMenu } = Menu;
-export default class NavLeft extends Component {
+class NavLeft extends Component {
+    state = {
+        currentKey: ""
+    }
+
+    handleClick = ({ item, key }) => {
+        const { dispatch } = this.props;
+        dispatch(switchMenu(item.props.title))
+        console.log(item);
+        this.setState({
+            currentKey: key
+        })
+    }
     UNSAFE_componentWillMount() {
         const menuTreeNode = this.renderMenu(MenuConfig);
+        let currentKey = window.location.hash.replace(/#|\?.*$/g, "");
         this.setState({
+            currentKey,
             menuTreeNode
         })
     }
@@ -37,10 +53,11 @@ export default class NavLeft extends Component {
                     <img src="assets/logo.png" />
                     <h1>Bic MS</h1>
                 </div>
-                <Menu theme="dark">
+                <Menu onClick={this.handleClick} theme="dark" selectedKeys={this.state.currentKey}>
                     {this.state.menuTreeNode}
                 </Menu>
             </div>
-        )
+        );
     }
 }
+export default connect()(NavLeft);
